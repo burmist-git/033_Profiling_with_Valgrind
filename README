@@ -4,3 +4,5 @@ https://developer.mantidproject.org/ProfilingWithValgrind.html
 
 valgrind --tool=callgrind --dump-instr=yes --simulate-cache=yes --collect-jumps=yes <executable> [args...]
 valgrind --tool=callgrind --dump-instr=yes --simulate-cache=yes --collect-jumps=yes --collect-atstart=no --instr-atstart=no <executable> [args...]
+
+kcachegrind callgrind.out.23073

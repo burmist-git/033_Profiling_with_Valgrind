@@ -1,7 +1,12 @@
-#include <time.h>
-#include "TRandom3.h"
-#include <math.h>
+//my
 #include "log_gaussian_lib.h"
+
+//C/C++
+#include <time.h>
+#include <math.h>
+
+//root
+#include "TRandom3.h"
 
 const unsigned int xDim = 196;
 const unsigned int yDim = 609;
@@ -12,12 +17,12 @@ const unsigned int zDim = 38;
 
 int main(){
   TRandom3 *rnd = new TRandom3(1234567890);
-
-  auto x = new double[xDim][yDim][1];
-  auto mean = new double[xDim][yDim][zDim];
-  auto sigma = new double[xDim][yDim][zDim];
-  auto log_pdf = new double[xDim][yDim][zDim];
   
+  std::vector<std::vector<std::vector<double>>> x;
+  std::vector<std::vector<std::vector<double>>> mean;
+  std::vector<std::vector<std::vector<double>>> sigma;
+  std::vector<std::vector<std::vector<double>>> log_pdf;
+  //
   unsigned int i = 0;
   unsigned int j = 0;
   unsigned int k = 0;
@@ -27,27 +32,66 @@ int main(){
   double x_sigma = 1.0;
   double sigma_mean = 2.0;
   double sigma_sigma = 0.001;
-  //
-  for(i = 0;i<xDim;i++){
-    for(j = 0;j<yDim;j++){
-      x[i][j][0] = rnd->Gaus(x_mean,x_sigma);
-      for(k = 0;k<zDim;k++){
-	mean[i][j][k] = rnd->Gaus(x_mean,x_sigma);
-	sigma[i][j][k] = rnd->Gaus(sigma_mean,sigma_sigma);
+  // x
+  for ( i=0; i<xDim; i++){
+    std::vector<std::vector<double>> ppx;
+    for ( j=0; j<yDim; j++){
+      std::vector<double> px;
+      for ( k=0; k<1; k++){
+	px.push_back(rnd->Gaus(x_mean,x_sigma));
       }
+      ppx.push_back(px);
     }
+    x.push_back(ppx);
   }
-  /*
-  unsigned int n=10;
+  // mean
+  for ( i=0; i<xDim; i++){
+    std::vector<std::vector<double>> ppx;
+    for ( j=0; j<yDim; j++){
+      std::vector<double> px;
+      for ( k=0; k<zDim; k++){
+	px.push_back(rnd->Gaus(x_mean,x_sigma));
+      }
+      ppx.push_back(px);
+    }
+    mean.push_back(ppx);
+  }
+  // sigma
+  for ( i=0; i<xDim; i++){
+    std::vector<std::vector<double>> ppx;
+    for ( j=0; j<yDim; j++){
+      std::vector<double> px;
+      for ( k=0; k<zDim; k++){
+	px.push_back(rnd->Gaus(sigma_mean,sigma_sigma));
+      }
+      ppx.push_back(px);
+    }
+    sigma.push_back(ppx);
+  }
+  // log_pdf
+  for ( i=0; i<xDim; i++){
+    std::vector<std::vector<double>> ppx;
+    for ( j=0; j<yDim; j++){
+      std::vector<double> px;
+      for ( k=0; k<zDim; k++){
+	px.push_back(0.0);
+      }
+      ppx.push_back(px);
+    }
+    log_pdf.push_back(ppx);
+  }
+  //
+  unsigned int n=3;
   double tottime = 0.0;
   for(l=0;l<n;l++){
-    //clock_t tic = clock();
-    log_gaussian(x, mean, sigma, log_pdf);
-    //clock_t toc = clock();
-    //tottime = tottime + (double)(toc - tic);
-    printf("sum: %f \n", sum(log_pdf));
+    clock_t tic = clock();
+    log_gaussian_ref(x, mean, sigma, log_pdf);
+    clock_t toc = clock();
+    //printf("%10.2f \n", makesum(log_pdf));
+    tottime = tottime + (double)(toc - tic);
   }
-  //printf("Elapsed: %f seconds\n", tottime / CLOCKS_PER_SEC / n);
-  */
+  printf("Elapsed: %f seconds\n", tottime / CLOCKS_PER_SEC / n);
+  //  
+
   return 0;
 }
